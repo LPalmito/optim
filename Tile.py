@@ -30,3 +30,8 @@ def nb_to_list(nb):
         result.append(a % 2 == 1)
         a //= 2
     return result
+
+
+def get_tile(i, j, list, n):
+    # Renvoie la tuile en position dans la liste correspondant à la position (i, j) dans la matrice
+    return list[i*n+j]

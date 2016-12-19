@@ -27,7 +27,7 @@ class CSP:
         """Ajoute une contrainte binaire sur le couple de variables x et y.
         :param x, y: identificateurs de variables entre 0 et n-1
         :param relation: ensemble de couple de valeurs u,v tel que
-        l'affectation x := u, y := u satisfait la contrainte.
+        l'affectation x := u, y := v satisfait la contrainte.
         (par abus de notation x est la variable et son indice).
         """
         self.conflict[x].append((y, relation))
@@ -132,6 +132,7 @@ class CSP:
         self.remove_vals(y, to_remove)
         return to_remove
 
+    # Ne dépend pas de y ?
     def hasSupport(self, y, v, x, relation):
         """est-ce que l'affectation y := v a un support dans le domaine de x ?
         """
