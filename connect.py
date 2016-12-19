@@ -6,6 +6,8 @@
 
 import sys
 from random import randint
+from Tile import Tile
+import pprint
 
 
 def generate():
@@ -73,8 +75,8 @@ def prettyprint(grid):
 
 
 def solve(grid):
-    # mettez votre code ici
-    pass
+    t_grid = [[Tile(grid[i][j]) for i in range(len(grid))] for j in range(len(grid[0]))]
+    # TODO: Do stuff
 
 
 def help():
@@ -85,13 +87,14 @@ def help():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3 and sys.argv[1] == "-g":
-        n = int(sys.argv[2])
-        generate()
-    elif len(sys.argv) == 2 and sys.argv[1] == "-p":
-        prettyprint(read_grid())
-    elif len(sys.argv) == 2 and sys.argv[1] == "-s":
-        solve(read_grid())
-    else:
-        help()
+    solve(read_grid())
+    # if len(sys.argv) == 3 and sys.argv[1] == "-g":
+    #     n = int(sys.argv[2])
+    #     generate()
+    # elif len(sys.argv) == 2 and sys.argv[1] == "-p":
+    #     prettyprint(read_grid())
+    # elif len(sys.argv) == 2 and sys.argv[1] == "-s":
+    #     solve(read_grid())
+    # else:
+    #     help()
 
