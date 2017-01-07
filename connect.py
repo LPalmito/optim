@@ -81,22 +81,24 @@ def solve(grid):
     t_grid_list = []
     for t_list in t_grid:
         t_grid_list.extend(t_list)
-    csp = CSP(t_grid_list)
+    domains = [set(range(4)) for _ in range(n**2)]
+    P = CSP(domains)
     # Add the constraints
     border = {(False, False)}
     link = {(True, True), (False, False)}
     # Border constraints
     for k in range(n):
-        csp.addConstraint(get_tile(0, k, csp.dom, n).connectors[0], get_tile(0, k, csp.dom, n).connectors[0], border)
-        csp.addConstraint(get_tile(k, 0, csp.dom, n).connectors[1], get_tile(k, 0, csp.dom, n).connectors[1], border)
-        csp.addConstraint(get_tile(n-1, k, csp.dom, n).connectors[2], get_tile(n-1, k, csp.dom, n).connectors[2], border)
-        csp.addConstraint(get_tile(k, n-1, csp.dom, n).connectors[3], get_tile(k, n-1, csp.dom, n).connectors[3], border)
+        P.addConstraint(get_tile(0, k, t_grid_list, n).connectors[0], get_tile(0, k, t_grid_list, n).connectors[0], border)
+        P.addConstraint(get_tile(k, 0, t_grid_list, n).connectors[1], get_tile(k, 0, t_grid_list, n).connectors[1], border)
+        P.addConstraint(get_tile(n-1, k, t_grid_list, n).connectors[2], get_tile(n-1, k, t_grid_list, n).connectors[2], border)
+        P.addConstraint(get_tile(k, n-1, t_grid_list, n).connectors[3], get_tile(k, n-1, t_grid_list, n).connectors[3], border)
     # Inner constraints
     for i in range(n-1):
         for j in range(n-1):
-            csp.addConstraint(get_tile(i, j, csp.dom, n).connectors[3], get_tile(i+1, j, csp.dom, n).connectors[1], link)
-            csp.addConstraint(get_tile(i, j, csp.dom, n).connectors[2], get_tile(i, j+1, csp.dom, n).connectors[0], link)
-    csp.solve()
+            P.addConstraint(get_tile(i, j, t_grid_list, n).connectors[3], get_tile(i+1, j, t_grid_list, n).connectors[1], link)
+            P.addConstraint(get_tile(i, j, t_grid_list, n).connectors[2], get_tile(i, j+1, t_grid_list, n).connectors[0], link)
+    for test in P.solve():
+        print(test)
     # TODO: Understand how the CSP object works
 
 
