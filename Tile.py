@@ -1,8 +1,9 @@
+
 class Tile:
 
     def __init__(self, hexa):
         self.connectors = nb_to_list(hexa)
-        self.nb_rots = 0
+        self.nb_rots = hexa_to_nb_rot(hexa)
 
     def rot(self):
         # Effectue une rotation de la tuile d'un quart de tour dans le sens trigonométrique
@@ -32,6 +33,13 @@ def nb_to_list(nb):
     return result
 
 
-def get_tile(i, j, list, n):
-    # Renvoie la tuile en position dans la liste correspondant à la position (i, j) dans la matrice
-    return list[i*n+j]
+def M(i, j, n):
+    # Renvoie la position de la tuile située en (i, j) dans la matrice
+    return i*n+j
+
+
+def hexa_to_nb_rot(hexa):
+    rot_families = [[0, 1, 3, 5, 7, 15], [2, 6, 10, 14], [4, 12, 13], [8, 9, 11]]
+    for nb_rot, rot_family in enumerate(rot_families):
+        if hexa in rot_family:
+            return nb_rot

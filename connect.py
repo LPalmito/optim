@@ -6,7 +6,7 @@
 
 import sys
 from random import randint
-from Tile import Tile, get_tile
+from Tile import Tile, M
 from CentraleSupelec import CSP
 import pprint
 
@@ -83,23 +83,52 @@ def solve(grid):
         t_grid_list.extend(t_list)
     domains = [set(range(4)) for _ in range(n**2)]
     P = CSP(domains)
-    # Add the constraints
-    border = {(False, False)}
-    link = {(True, True), (False, False)}
     # Border constraints
     for k in range(n):
-        P.addConstraint(get_tile(0, k, t_grid_list, n).connectors[0], get_tile(0, k, t_grid_list, n).connectors[0], border)
-        P.addConstraint(get_tile(k, 0, t_grid_list, n).connectors[1], get_tile(k, 0, t_grid_list, n).connectors[1], border)
-        P.addConstraint(get_tile(n-1, k, t_grid_list, n).connectors[2], get_tile(n-1, k, t_grid_list, n).connectors[2], border)
-        P.addConstraint(get_tile(k, n-1, t_grid_list, n).connectors[3], get_tile(k, n-1, t_grid_list, n).connectors[3], border)
+        # Top border
+        top = M(0, k, n)
+        P.addConstraint(top, top, get_link(top, top, 0, 0))
+        # Left border
+        left = M(k, 0, n)
+        P.addConstraint(left, left, get_link(left, left, 1, 1))
+        # Bottom border
+        bottom = M(n - 1, k, n)
+        P.addConstraint(bottom, bottom, get_link(bottom, bottom, 2, 2))
+        # Right border
+        right = M(k, n - 1, n)
+        P.addConstraint(right, right, get_link(right, right, 3, 3))
     # Inner constraints
     for i in range(n-1):
         for j in range(n-1):
-            P.addConstraint(get_tile(i, j, t_grid_list, n).connectors[3], get_tile(i+1, j, t_grid_list, n).connectors[1], link)
-            P.addConstraint(get_tile(i, j, t_grid_list, n).connectors[2], get_tile(i, j+1, t_grid_list, n).connectors[0], link)
+            P.addConstraint(M(i, j, n), M(i+1, j, n), get_link(M(i, j, n), M(i+1, j, n), 2, 0))     # Top-bottom link
+            P.addConstraint(M(i, j, n), M(i, j+1, n), get_link(M(i, j, n), M(i, j+1, n), 3, 1))     # Left-right link
     for test in P.solve():
         print(test)
-    # TODO: Understand how the CSP object works
+
+
+def get_hexa_family(hexa):
+    """Take the hexa of a tile and return the hexas of the tile family"""
+    hexa_families = [[0], [1, 2, 4, 8], [3, 6, 12, 9], [5, 10], [7, 14, 13, 11], [15]]
+    for hexa_family in hexa_families:
+        if hexa in hexa_family:
+            return hexa_family
+
+
+def get_link(i, j, i_border, j_border):
+    """
+    Return a list of possible rotation numbers for tile i and tile j based on constraint i_border-j_border
+    For left-right: i_border = 3, j_border = 1
+    For top-bottom: i_border = 2, j_border = 0
+    For border: i = j, i_border = j_border = 0, 1, 2 or 3
+    """
+    i_family, j_family = get_hexa_family(i), get_hexa_family(j)
+    tuples = set()
+    for i_hexa in i_family:
+        for j_hexa in j_family:
+            i_tile, j_tile = Tile(i_hexa), Tile(j_hexa)
+            if i_tile.connectors[i_border] == j_tile.connectors[j_border]:
+                tuples.add((i_tile.nb_rots, j_tile.nb_rots))
+    return tuples
 
 
 def help():
