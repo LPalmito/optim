@@ -11,7 +11,7 @@ from CentraleSupelec import CSP
 import pprint
 
 
-def generate():
+def generate(n):
     """Generates a random grid
     """
     # generate random connections, place 0 at the border
@@ -118,4 +118,3 @@ if __name__ == '__main__':
     #     solve(read_grid())
     # else:
     #     help()
-
