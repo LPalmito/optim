@@ -6,7 +6,7 @@
 
 import sys
 from random import randint
-from Tile import Tile, M
+from Tile import Tile
 from CentraleSupelec import CSP
 import pprint
 
@@ -75,35 +75,32 @@ def prettyprint(grid):
         print()
 
 
-def solve(grid):
-    n = len(grid)
-    t_grid = [[Tile(grid[i][j]) for i in range(n)] for j in range(n)]
-    t_grid_list = []
-    for t_list in t_grid:
-        t_grid_list.extend(t_list)
+def solve(M):
+    n = len(M)
+    L = []
+    for t_list in M:
+        L.extend(t_list)
     domains = [set(range(4)) for _ in range(n**2)]
-    P = CSP(domains)
-    # Border constraints
+    # Borders constraints
     for k in range(n):
-        # Top border
-        top = M(0, k, n)
-        P.addConstraint(top, top, get_link(top, top, 0, 0))
-        # Left border
-        left = M(k, 0, n)
-        P.addConstraint(left, left, get_link(left, left, 1, 1))
-        # Bottom border
-        bottom = M(n - 1, k, n)
-        P.addConstraint(bottom, bottom, get_link(bottom, bottom, 2, 2))
-        # Right border
-        right = M(k, n - 1, n)
-        P.addConstraint(right, right, get_link(right, right, 3, 3))
-    # Inner constraints
-    for i in range(n-1):
-        for j in range(n-1):
-            P.addConstraint(M(i, j, n), M(i+1, j, n), get_link(M(i, j, n), M(i+1, j, n), 2, 0))     # Top-bottom link
-            P.addConstraint(M(i, j, n), M(i, j+1, n), get_link(M(i, j, n), M(i, j+1, n), 3, 1))     # Left-right link
-    for test in P.solve():
-        print(test)
+        domains[0*n+k] = get_border(M[0][k], 0)
+        domains[k*n+0] = get_border(M[k][0], 1)
+        domains[(n-1)*n+k] = get_border(M[n-1][k], 2)
+        domains[k*n+(n-1)] = get_border(M[k][n-1], 3)
+    # Angles constraints
+    domains[0] = get_border(M[0][0], 0).intersection(get_border(M[0][0], 1))
+    domains[n-1] = get_border(M[0][n-1], 0).intersection(get_border(M[0][n-1], 3))
+    domains[n**2-n] = get_border(M[n-1][0], 1).intersection(get_border(M[n-1][0], 2))
+    domains[n**2-1] = get_border(M[n-1][n-1], 2).intersection(get_border(M[n-1][n-1], 3))
+    P = CSP(domains)
+    # Top-bottom links
+    for k in range(n**2-n):
+        P.addConstraint(k, k+n, get_link(L[k], L[k+n], 2, 0))
+    # Left-right links
+    for k in range(n**2-1):
+        P.addConstraint(k, k+1, get_link(L[k], L[k+1], 3, 1))
+    for sol in P.solve():
+        print(sol)
 
 
 def get_hexa_family(hexa):
@@ -119,7 +116,6 @@ def get_link(i, j, i_border, j_border):
     Return a list of possible rotation numbers for tile i and tile j based on constraint i_border-j_border
     For left-right: i_border = 3, j_border = 1
     For top-bottom: i_border = 2, j_border = 0
-    For border: i = j, i_border = j_border = 0, 1, 2 or 3
     """
     i_family, j_family = get_hexa_family(i), get_hexa_family(j)
     tuples = set()
@@ -129,6 +125,19 @@ def get_link(i, j, i_border, j_border):
             if i_tile.connectors[i_border] == j_tile.connectors[j_border]:
                 tuples.add((i_tile.nb_rots, j_tile.nb_rots))
     return tuples
+
+
+def get_border(k, k_border):
+    """
+    Return a list of possible rotation numbers for tile k on constraint k_border = False
+    """
+    k_family = get_hexa_family(k)
+    border_dom = set()
+    for k_hexa in k_family:
+        k_tile = Tile(k_hexa)
+        if not k_tile.connectors[k_border]:
+            border_dom.add(k_tile.nb_rots)
+    return border_dom
 
 
 def help():

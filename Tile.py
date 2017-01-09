@@ -22,7 +22,6 @@ class Tile:
                 hexa += 2**i
         return hexa
 
-
 def nb_to_list(nb):
     # Prend le nombre hexadécimal d'une tuile et renvoie une liste de boolean codant la présence ou non des 4 connecteurs
     result = []
@@ -31,11 +30,6 @@ def nb_to_list(nb):
         result.append(a % 2 == 1)
         a //= 2
     return result
-
-
-def M(i, j, n):
-    # Renvoie la position de la tuile située en (i, j) dans la matrice
-    return i*n+j
 
 
 def hexa_to_nb_rot(hexa):
