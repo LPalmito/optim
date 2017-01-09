@@ -6,10 +6,9 @@
 
 import sys
 from random import randint
-from Tile import Tile
-from CentraleSupelec import CSP
+from optim.Tile import Tile
+from optim.CentraleSupelec import CSP
 import pprint
-
 
 def generate(n):
     """Generates a random grid
@@ -76,38 +75,63 @@ def prettyprint(grid):
 
 
 def solve(M):
+    """
+    :param M: the grid to be solved
+    :return: solution
+    """
     n = len(M)
     L = []
     for t_list in M:
         L.extend(t_list)
-    domains = [set(range(4)) for _ in range(n**2)]
+    domains = [set(range(4)) for _ in range(n**2)]  # Initialize domain
+
     # Borders constraints
     for k in range(n):
         domains[0*n+k] = get_border(M[0][k], 0)
         domains[k*n+0] = get_border(M[k][0], 1)
         domains[(n-1)*n+k] = get_border(M[n-1][k], 2)
         domains[k*n+(n-1)] = get_border(M[k][n-1], 3)
+
     # Angles constraints
     domains[0] = get_border(M[0][0], 0).intersection(get_border(M[0][0], 1))
     domains[n-1] = get_border(M[0][n-1], 0).intersection(get_border(M[0][n-1], 3))
     domains[n**2-n] = get_border(M[n-1][0], 1).intersection(get_border(M[n-1][0], 2))
     domains[n**2-1] = get_border(M[n-1][n-1], 2).intersection(get_border(M[n-1][n-1], 3))
+
+    # Initialize solver
     P = CSP(domains)
-    # Top-bottom links
+
+    # Top-bottom constraints
     for k in range(n**2-n):
         P.addConstraint(k, k+n, get_link(L[k], L[k+n], 2, 0))
-    # Left-right links
+    # Left-right constraints
     for k in range(n**2-1):
         P.addConstraint(k, k+1, get_link(L[k], L[k+1], 3, 1))
+
+    # Building and printing solution (only one solution if not unique)
+    l = 0
     M_sol = [[0 for i in range(n)] for j in range(n)]
     for sol in P.solve():
+        if l != 0:
+            print("# la solution n'est pas unique")
+            break
         for k, rot in enumerate(sol):
             M_sol[k//n][k%n] = get_hexa_family(L[k])[rot]
-    prettyprint(M_sol)
+        for line in M_sol:
+            for element in range(len(line)-1):
+                print(line[element], end='')
+            print(line[-1])
+        l += 1
+    if l == 1:
+        print("# la solution est unique")
+
 
 
 def get_hexa_family(hexa):
-    """Take the hexa of a tile and return the hexas of the tile family"""
+    """
+    Take the hexa of a tile and return the hexas of the tile family
+    A Tile family gathers elements with the same number of connections
+    """
     hexa_families = [[0], [1, 2, 4, 8], [3, 6, 12, 9], [5, 10], [7, 14, 13, 11], [15]]
     for hexa_family in hexa_families:
         if hexa in hexa_family:

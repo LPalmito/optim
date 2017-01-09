@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from CentraleSupelec import CSP
+from optim.CentraleSupelec import CSP
 import sys
 
 n = int(sys.argv[1])
