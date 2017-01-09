@@ -99,8 +99,11 @@ def solve(M):
     # Left-right links
     for k in range(n**2-1):
         P.addConstraint(k, k+1, get_link(L[k], L[k+1], 3, 1))
+    M_sol = [[0 for i in range(n)] for j in range(n)]
     for sol in P.solve():
-        print(sol)
+        for k, rot in enumerate(sol):
+            M_sol[k//n][k%n] = get_hexa_family(L[k])[rot]
+    prettyprint(M_sol)
 
 
 def get_hexa_family(hexa):
