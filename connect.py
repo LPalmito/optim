@@ -6,9 +6,10 @@
 
 import sys
 from random import randint
-from optim.Tile import Tile
-from optim.CentraleSupelec import CSP
+from Tile import Tile
+from CentraleSupelec import CSP
 import pprint
+
 
 def generate(n):
     """Generates a random grid
@@ -116,7 +117,7 @@ def solve(M):
             print("# la solution n'est pas unique")
             break
         for k, rot in enumerate(sol):
-            M_sol[k//n][k%n] = get_hexa_family(L[k])[rot]
+            M_sol[k//n][k%n] = format(get_hexa_family(L[k])[rot], '01x')
         for line in M_sol:
             for element in range(len(line)-1):
                 print(line[element], end='')
@@ -124,7 +125,6 @@ def solve(M):
         l += 1
     if l == 1:
         print("# la solution est unique")
-
 
 
 def get_hexa_family(hexa):
@@ -175,13 +175,12 @@ def help():
 
 
 if __name__ == '__main__':
-    solve(read_grid())
-    # if len(sys.argv) == 3 and sys.argv[1] == "-g":
-    #     n = int(sys.argv[2])
-    #     generate()
-    # elif len(sys.argv) == 2 and sys.argv[1] == "-p":
-    #     prettyprint(read_grid())
-    # elif len(sys.argv) == 2 and sys.argv[1] == "-s":
-    #     solve(read_grid())
-    # else:
-    #     help()
+    if len(sys.argv) == 3 and sys.argv[1] == "-g":
+        n = int(sys.argv[2])
+        generate(n)
+    elif len(sys.argv) == 2 and sys.argv[1] == "-p":
+        prettyprint(read_grid())
+    elif len(sys.argv) == 2 and sys.argv[1] == "-s":
+        solve(read_grid())
+    else:
+        help()
