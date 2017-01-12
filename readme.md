@@ -32,5 +32,9 @@ Nous avons choisi de travailler avec les rotations des différentes tuiles du pr
 5) Ajout des contraintes liées aux liens gauche-droite entre les tuiles (en passant par des objets 'Tile')
 6) Résolution du problème et affichage des résultats
 
+### Mesures de performance :
+![alt tag](https://raw.githubusercontent.com/LPalmito/optim/img/min_avg_max.png)
+![alt tag](https://raw.githubusercontent.com/LPalmito/optim/img/with_or_without_AC.png)
+
 PS : Pour la solution du cadeau de Noël, c'est par ici !
 => http://www-desir.lip6.fr/~durrc/Iut/optim/images/19412
