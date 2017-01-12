@@ -1,4 +1,5 @@
 #Optimisation - Devoir Maison n°1
+###### Par Augustin Courtier & Yannick Morel
 
 ###Ce dossier contient :
 
@@ -13,8 +14,8 @@ Celui-ci contient :
 
 + Une classe 'Tile', pour représenter au mieux les tuiles. 'Tile' contient :
     + 2 attributs :
-        + 'connectors', qui contient un tableau de booléens représentant la présence d'un connecteur ou non sur la face concernée
-        + 'nb_rots', qui contient l'orientation de la tuile, codée par une nombre entier entre 0 et 3
+        + 'connectors', qui contient un tableau de 4 booléens représentant la présence d'un connecteur ou non sur la face concernée
+        + 'nb_rots', qui contient l'orientation de la tuile, codée par une nombre entier entre 0 et 3 (0 correspondant aux tuiles 0, 1, 3, 5, 7, f)
     + 1 méthode :
         + 'get_hexa', qui renvoie le nombre hexadécimal correspondant à la tuile
 + 2 méthodes annexes :
