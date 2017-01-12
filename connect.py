@@ -6,8 +6,9 @@
 
 import sys
 from random import randint
-from Tile import Tile
-from CentraleSupelec import CSP
+from optim.Tile import Tile
+from optim.CentraleSupelec import CSP
+import time
 import pprint
 
 
@@ -18,6 +19,7 @@ def generate(n):
     lr = [[randint(0, 1) for j in range(n-1)] + [0] for i in range(n)]
     tb = [[randint(0, 1) for j in range(n)] for i in range(n-1)]
     tb += [[0] * n]
+    grid = [[0 for i in range(n)] for j in range(n)]
     for i in range(n):
         for j in range(n):
             # encoding of the cell
@@ -25,8 +27,10 @@ def generate(n):
             cc = c | (c << 4)
             # normalized orientation
             p = min((cc >> i) & 15 for i in range(4))
-            print(hex(p)[-1], end='')
-        print()
+            # print(hex(p)[-1], end='')
+            grid[i][j] = hex(p)[-1]
+        # print()
+    return grid
 
 
 def read_line():
@@ -112,7 +116,11 @@ def solve(M):
     # Building and printing solution (only one solution if not unique)
     l = 0
     M_sol = [[0 for i in range(n)] for j in range(n)]
-    for sol in P.solve():
+    result = P.solve()
+    length = len(list(result))
+    if length == 0:
+        print("# Il n'y a pas de solution pour la grille")
+    for sol in result:
         if l != 0:
             print("# la solution n'est pas unique")
             break
@@ -125,6 +133,7 @@ def solve(M):
         l += 1
     if l == 1:
         print("# la solution est unique")
+    return len(list(result)) != 0
 
 
 def get_hexa_family(hexa):
@@ -158,7 +167,7 @@ def get_border(k, k_border):
     """
     Return a list of possible rotation numbers for tile k on constraint k_border = False
     """
-    k_family = get_hexa_family(k)
+    k_family = get_hexa_family(int(k))
     border_dom = set()
     for k_hexa in k_family:
         k_tile = Tile(k_hexa)
@@ -175,12 +184,34 @@ def help():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3 and sys.argv[1] == "-g":
-        n = int(sys.argv[2])
-        generate(n)
-    elif len(sys.argv) == 2 and sys.argv[1] == "-p":
-        prettyprint(read_grid())
-    elif len(sys.argv) == 2 and sys.argv[1] == "-s":
-        solve(read_grid())
-    else:
-        help()
+    # solve(read_grid())
+    durations = {}
+    averages = []
+    for k in range(2, 10):
+        print(k)
+        durations[k+1] = []
+        count = 0
+        while count < 1:
+            grid = generate(k+1)
+            start = time.time()
+            hasResult = solve(grid)
+            print(hasResult)
+            end = time.time()
+            if hasResult:
+                duration = end - start
+                durations[k+1].append(duration)
+                count += 1
+        averages.append(sum(durations[k+1])/len(durations[k+1]))
+    print(averages)
+
+
+
+    # if len(sys.argv) == 3 and sys.argv[1] == "-g":
+    #     n = int(sys.argv[2])
+    #     generate(n)
+    # elif len(sys.argv) == 2 and sys.argv[1] == "-p":
+    #     prettyprint(read_grid())
+    # elif len(sys.argv) == 2 and sys.argv[1] == "-s":
+    #     solve(read_grid())
+    # else:
+    #     help()
