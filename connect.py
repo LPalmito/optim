@@ -8,16 +8,19 @@ import sys
 from random import randint
 from Tile import Tile
 from CentraleSupelec import CSP
+import time
 import pprint
+import matplotlib.pyplot as plt
 
 
-def generate(n):
+def generate(n, with_print=True):
     """Generates a random grid
     """
     # generate random connections, place 0 at the border
     lr = [[randint(0, 1) for j in range(n-1)] + [0] for i in range(n)]
     tb = [[randint(0, 1) for j in range(n)] for i in range(n-1)]
     tb += [[0] * n]
+    grid = [[0 for i in range(n)] for j in range(n)]
     for i in range(n):
         for j in range(n):
             # encoding of the cell
@@ -25,8 +28,12 @@ def generate(n):
             cc = c | (c << 4)
             # normalized orientation
             p = min((cc >> i) & 15 for i in range(4))
-            print(hex(p)[-1], end='')
-        print()
+            if with_print:
+                print(hex(p)[-1], end='')
+            grid[i][j] = int(p)
+        if with_print:
+            print()
+    return grid
 
 
 def read_line():
@@ -75,7 +82,7 @@ def prettyprint(grid):
         print()
 
 
-def solve(M):
+def solve(M, with_print=True):
     """
     :param M: the grid to be solved
     :return: solution
@@ -112,19 +119,52 @@ def solve(M):
     # Building and printing solution (only one solution if not unique)
     l = 0
     M_sol = [[0 for i in range(n)] for j in range(n)]
+    if with_print:
+        if len(list(P.solve())) == 0:
+            print("# Il n'y a pas de solution pour cette grille")
     for sol in P.solve():
         if l != 0:
-            print("# la solution n'est pas unique")
+            if with_print:
+                print("# la solution n'est pas unique")
             break
         for k, rot in enumerate(sol):
             M_sol[k//n][k%n] = format(get_hexa_family(L[k])[rot], '01x')
-        for line in M_sol:
-            for element in range(len(line)-1):
-                print(line[element], end='')
-            print(line[-1])
+        if with_print:
+            for line in M_sol:
+                for element in range(len(line)-1):
+                    print(line[element], end='')
+                print(line[-1])
         l += 1
     if l == 1:
-        print("# la solution est unique")
+        if with_print:
+            print("# la solution est unique")
+    return len(list(P.solve())) != 0
+
+
+def measure_perf(n_max, precision):
+    """Measure the performances of the solve method and print a graph from it"""
+    durations, averages, minimums, maximums = {}, {}, {}, {}
+    for k in range(1, n_max):
+        durations[k] = []
+        count = 0
+        while count < precision:
+            grid = generate(k, with_print=False)
+            start = time.time()
+            hasResult = solve(grid, with_print=False)
+            end = time.time()
+            if hasResult:
+                duration = (end - start) * 1000
+                durations[k].append(duration)
+                count += 1
+        averages[k] = sum(durations[k]) / len(durations[k])
+        minimums[k] = min(durations[k])
+        maximums[k] = max(durations[k])
+    plt.figure(1)
+    plt.title('Temps de résolution (en ms) en fonction de n')
+    plt.plot(list(range(1, n_max)), list(minimums.values()))
+    plt.plot(list(range(1, n_max)), list(averages.values()))
+    plt.plot(list(range(1, n_max)), list(maximums.values()))
+    plt.show()
 
 
 def get_hexa_family(hexa):
@@ -175,12 +215,13 @@ def help():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3 and sys.argv[1] == "-g":
-        n = int(sys.argv[2])
-        generate(n)
-    elif len(sys.argv) == 2 and sys.argv[1] == "-p":
-        prettyprint(read_grid())
-    elif len(sys.argv) == 2 and sys.argv[1] == "-s":
-        solve(read_grid())
-    else:
-        help()
+    measure_perf(20, 50)
+    # if len(sys.argv) == 3 and sys.argv[1] == "-g":
+    #     n = int(sys.argv[2])
+    #     generate(n)
+    # elif len(sys.argv) == 2 and sys.argv[1] == "-p":
+    #     prettyprint(read_grid())
+    # elif len(sys.argv) == 2 and sys.argv[1] == "-s":
+    #     solve(read_grid())
+    # else:
+    #     help()
