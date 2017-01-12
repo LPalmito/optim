@@ -33,8 +33,14 @@ Nous avons choisi de travailler avec les rotations des différentes tuiles du pr
 6) Résolution du problème et affichage des résultats
 
 ### Mesures de performance :
-![alt tag](https://raw.githubusercontent.com/LPalmito/optim/img/min_avg_max.png)
-![alt tag](https://raw.githubusercontent.com/LPalmito/optim/img/with_or_without_AC.png)
+Nous avons effectué des mesures de performance pour un échantillon de 50 essais avec solution pour n variant de 1 à 20, voici les résultats que nous obtenons :
+![alt tag](https://raw.githubusercontent.com/LPalmito/optim/master/img/min_avg_max.png)
+![alt tag](https://raw.githubusercontent.com/LPalmito/optim/master/img/with_or_without_AC.png)
+On remarque donc qu'il est plus efficace de maintenir l'arc consistance pour n<12, alors que la tendance s'inverse au-delà de cette valeur.
+Il est possible d'effectuer d'autres mesures de performance en runnant `perfs.py`. La méthode 'measure_perf' est alors lancée, elle prend pour arguments:
+
++ 'n_max': les mesures de performance seront effectuées pour tout n entre 1 et n_max (pour des grilles de taille n*n)
++ 'precision': le nombre de mesures effectuées pour chaque n, plus 'precision' est grand, plus les mesures seront significatives
 
 PS : Pour la solution du cadeau de Noël, c'est par ici !
 => http://www-desir.lip6.fr/~durrc/Iut/optim/images/19412
