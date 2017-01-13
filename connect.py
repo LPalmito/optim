@@ -9,6 +9,8 @@ from random import randint
 from Tile import Tile
 from CentraleSupelec import CSP
 
+# /!\ Depending on which computer we were using, we needed to add an 'optim' within the imports (for Augustin's PC)
+
 
 def generate(n, with_print=True):
     """Generates a random grid
@@ -116,28 +118,28 @@ def solve(M, with_print=True, maintain_AC=False):
         P.addConstraint(k, k+1, get_link(L[k], L[k+1], 3, 1))
 
     # Building and printing solution (only one solution if not unique)
-    l = 0
     M_sol = [[0 for i in range(n)] for j in range(n)]
-    if with_print:
-        if len(list(P.solve())) == 0:
+    N_sol = len(list(P.solve()))
+    if N_sol == 0:
+        if with_print:
             print("# Il n'y a pas de solution pour cette grille")
-    for sol in P.solve():
-        if l != 0:
+    else:
+        for sol in P.solve():
+            for k, rot in enumerate(sol):
+                M_sol[k//n][k%n] = format(get_hexa_family(L[k])[rot], '01x')
             if with_print:
-                print("# la solution n'est pas unique")
+                for line in M_sol:
+                    for element in range(len(line)-1):
+                        print(line[element], end='')
+                    print(line[-1])
+            if N_sol > 1:
+                if with_print:
+                    print("# la solution n'est pas unique")
+            else:
+                if with_print:
+                    print("# la solution est unique")
             break
-        for k, rot in enumerate(sol):
-            M_sol[k//n][k%n] = format(get_hexa_family(L[k])[rot], '01x')
-        if with_print:
-            for line in M_sol:
-                for element in range(len(line)-1):
-                    print(line[element], end='')
-                print(line[-1])
-        l += 1
-    if l == 1:
-        if with_print:
-            print("# la solution est unique")
-    return len(list(P.solve())) != 0
+    return N_sol != 0
 
 
 def get_hexa_family(hexa):
